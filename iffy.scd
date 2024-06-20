@@ -15,6 +15,7 @@ y={
 
 y.free;
 
+(
 SynthDef(
 	\iffySynth,
 	{
@@ -25,9 +26,11 @@ SynthDef(
 		Out.ar(out,sig)
 	}
 ).add;
+)
 
 z = Synth(\iffySynth,[\a,1,\r,1]);
 
+(
 Tdef(
 	\iffyTask,
 	{
@@ -39,11 +42,15 @@ Tdef(
 		}
 	}
 )
+)
 
 Tdef(\iffyTask).play;
 
+Tdef(\iffyTask).stop;
+
 ~timer=TempoClock(111/60);
 
+(
 Tdef(
 	\otherTask,
 	{
@@ -55,9 +62,11 @@ Tdef(
 		}
 	}
 ).clock_(~timer).quant_(4)
+)
 
 Tdef(\otherTask).play;
 
+(
 Tdef(
 	\thirdTask,
 	{
@@ -69,11 +78,17 @@ Tdef(
 		}
 	}
 ).clock_(~timer).quant_(4)
+)
 
 Tdef(\thirdTask).play;
 
+Tdef(\otherTask).stop;
+
+Tdef(\thirdTask).stop;
+
 ~timer.tempo_(200/60);
 
+(
 3.do(
 	{
 		arg i;
@@ -82,8 +97,8 @@ Tdef(\thirdTask).play;
 			{
 				var delta;
 				loop {
-					delta = 2+i;
-					Synth(\iffySynth,[\freq,220*(i+1),\a,0.1,\r,0.5,\pan,rrand(-1,1)]);
+					delta = 0.5+i;
+					Synth(\iffySynth,[\freq,220*(i+1),\a,0.01,\r,0.5,\pan,rrand(-1,1)]);
 					delta.yield;
 				}
 			}
@@ -91,27 +106,33 @@ Tdef(\thirdTask).play;
 		Tdef(i.asSymbol).play
 	}
 )
+)
 
 3.do({arg i; Tdef(i.asSymbol).stop});
 
 ~notes=PatternProxy(Pseq([880,440,220,440,660],inf)).asStream;
-~durs=PatternProxy(Pseq([1,4,1,2],inf)).asStream;
+~durs=PatternProxy(Pseq([0.5,1,2,3],inf)).asStream;
 ~pans=PatternProxy(Pseq([-1,1],inf)).asStream;
 
+(
 Tdef(
 	\seqTask,
 		{
 		var delta;
 		loop {
 			delta = ~durs.next;
-			Synth(\iffySynth,[\freq,~notes.next,\a,0.1,\r,0.5,\pan,~pans.next]);
+			Synth(\iffySynth,[\freq,~notes.next,\a,0.01,\r,0.75,\pan,~pans.next]);
 			delta.yield;
 		}
 	}
 ).clock_(~timer).quant_(4)
+)
 
 Tdef(\seqTask).play;
 
+Tdef(\seqTask).stop;
+
+(
 3.do(
 	{
 		arg i;
@@ -121,7 +142,7 @@ Tdef(\seqTask).play;
 				var delta;
 				loop {
 					delta = ~durs.next;
-					Synth(\iffySynth,[\freq,~notes.next,\a,0.1,\r,0.5,\pan,~pans.next]);
+					Synth(\iffySynth,[\freq,~notes.next,\a,0.01,\r,0.75,\pan,~pans.next]);
 					delta.yield;
 				}
 			}
@@ -129,9 +150,11 @@ Tdef(\seqTask).play;
 		Tdef(i.asSymbol).play
 	}
 )
+)
 
 3.do({arg i; Tdef(i.asSymbol).stop});
 
+(
 SynthDef(
 	\0,
 	{
@@ -175,8 +198,10 @@ SynthDef(
 		Out.ar(out,sig)
 	}
 ).add;
+)
 
-3.do(
+(
+4.do(
 	{
 		arg i;
 		Tdef(
@@ -185,7 +210,7 @@ SynthDef(
 				var delta;
 				loop {
 					delta = ~durs.next;
-					Synth(i.asSymbol,[\freq,~notes.next,\a,0.1,\r,0.5,\pan,~pans.next]);
+					Synth(i.asSymbol,[\freq,~notes.next,\a,0.01,\r,0.75,\pan,~pans.next]);
 					delta.yield;
 				}
 			}
@@ -193,5 +218,6 @@ SynthDef(
 		Tdef(i.asSymbol).play
 	}
 )
+)
 
-3.do({arg i; Tdef(i.asSymbol).stop});
+4.do({arg i; Tdef(i.asSymbol).stop});
